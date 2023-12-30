@@ -2,8 +2,6 @@ package com.lavender.reminder.data.work
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.Instant
-import java.time.LocalDateTime
 
 @Entity(tableName = "work")
 data class LocalWorkState(

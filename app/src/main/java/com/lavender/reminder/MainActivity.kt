@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
     private fun scheduleWork() {
         val workRequest: PeriodicWorkRequest = PeriodicWorkRequestBuilder<UpdateProgressWork>(
-            repeatInterval = 12, repeatIntervalTimeUnit = TimeUnit.HOURS
+            repeatInterval = 1, repeatIntervalTimeUnit = TimeUnit.HOURS
         ).build()
 
         Log.d(tag, "scheduleWork (workRequest: $workRequest)")
