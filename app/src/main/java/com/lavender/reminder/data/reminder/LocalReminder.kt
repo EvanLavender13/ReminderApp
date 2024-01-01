@@ -10,7 +10,8 @@ data class LocalReminder(
     var name: String,
     var start: DayOfWeek,
     var frequency: Int,
-    var progress: Int
+    var progressDays: Int,
+    var progressWeeks: Int
 )
 
 fun LocalReminder.toExternal() = Reminder(
@@ -18,7 +19,7 @@ fun LocalReminder.toExternal() = Reminder(
     name = name,
     start = start,
     frequency = frequency,
-    progress = progress
+    progress = Pair(progressDays, progressWeeks)
 )
 
 fun List<LocalReminder>.toExternal() = map(LocalReminder::toExternal)

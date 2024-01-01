@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.DropdownMenuItem
@@ -24,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -34,26 +36,37 @@ import java.time.DayOfWeek
 @Composable
 fun ReminderDetailsScreen(
     viewModel: ReminderDetailsModel = hiltViewModel(),
-    navigateToMain: () -> Unit,
+    navigateBack: () -> Unit,
     updateProgress: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(floatingActionButton = {
         Column(
-            modifier = Modifier.padding(15.0.dp),
-            verticalArrangement = Arrangement.spacedBy(15.0.dp)
+            modifier = Modifier.padding(25.dp), verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
+            if (!uiState.new) {
+                FloatingActionButton(onClick = {
+                    viewModel.deleteReminder()
+                    navigateBack()
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete/Cancel",
+                        tint = Color.Red
+                    )
+                }
+            }
+
             FloatingActionButton(onClick = {
-                viewModel.deleteReminder()
-                navigateToMain()
-            }) { Icon(Icons.Default.Delete, contentDescription = "Delete/Cancel") }
+                navigateBack()
+            }) { Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back") }
 
             FloatingActionButton(onClick = {
                 viewModel.saveReminder()
                 updateProgress()
-                navigateToMain()
-            }) { Icon(Icons.Default.Done, contentDescription = "Save") }
+                navigateBack()
+            }) { Icon(imageVector = Icons.Default.Done, contentDescription = "Save") }
         }
 
     }) { padding ->
@@ -77,13 +90,16 @@ fun ReminderDetails(
     name: String,
     start: DayOfWeek,
     frequency: Int,
-    progress: Int,
+    progress: Pair<Int, Int>,
     onNameChanged: (String) -> Unit,
     onStartChanged: (DayOfWeek) -> Unit,
     onFrequencyChanged: (Int) -> Unit
 ) {
     var startExpanded by remember { mutableStateOf(false) }
     var frequencyExpanded by remember { mutableStateOf(false) }
+
+    val days = progress.first
+    val weeks = progress.second
 
     Row {
         TextField(
@@ -98,7 +114,7 @@ fun ReminderDetails(
         ExposedDropdownMenuBox(
             expanded = startExpanded,
             onExpandedChange = { startExpanded = !startExpanded }) {
-            TextField(value = start.toString(),
+            TextField(value = start.name.lowercase(),
                 label = { Text(text = "Start") },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = startExpanded) },
                 modifier = Modifier
@@ -112,7 +128,7 @@ fun ReminderDetails(
                 expanded = startExpanded,
                 onDismissRequest = { startExpanded = false }) {
                 DayOfWeek.values().forEach {
-                    DropdownMenuItem(text = { Text(it.name) }, onClick = {
+                    DropdownMenuItem(text = { Text(it.name.lowercase()) }, onClick = {
                         startExpanded = false
                         onStartChanged(it)
                     })
@@ -147,7 +163,8 @@ fun ReminderDetails(
 
     Row {
         LinearProgressIndicator(
-            progress = progress.toFloat() / (7 * frequency), modifier = Modifier.weight(1.0f)
+            progress = (days.toFloat() + (7 * weeks)) / (7 * frequency),
+            modifier = Modifier.weight(1.0f)
         )
     }
 }

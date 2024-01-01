@@ -1,5 +1,10 @@
 package com.lavender.reminder
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -9,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,6 +37,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        createNotificationChannel()
         scheduleWork()
 
         setContent {
@@ -42,6 +49,30 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun createNotificationChannel() {
+        if (ActivityCompat.checkSelfPermission(
+                this@MainActivity, Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.d(tag, "Requesting ${Manifest.permission.POST_NOTIFICATIONS}")
+            ActivityCompat.requestPermissions(
+                this@MainActivity, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1
+            )
+        }
+
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val channelId = "ReminderAppChannel"
+        val channel = NotificationChannel(
+            channelId, "ReminderAppChannel", NotificationManager.IMPORTANCE_DEFAULT
+        )
+
+        Log.d(tag, "createNotificationChannel (channel: $channel)")
+        notificationManager.createNotificationChannel(channel)
+
     }
 
     private fun scheduleWork() {
@@ -75,11 +106,9 @@ fun ReminderNavHost(
         }
 
         composable("details/{uuid}") {
-            ReminderDetailsScreen(navigateToMain = {
-                navController.navigate(
-                    route = "main"
-                )
-            }, updateProgress = updateProgress)
+            ReminderDetailsScreen(
+                navigateBack = { navController.popBackStack() }, updateProgress = updateProgress
+            )
         }
     }
 }

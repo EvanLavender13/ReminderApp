@@ -1,5 +1,6 @@
 package com.lavender.reminder.data.reminder
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lavender.reminder.util.Async
@@ -15,11 +16,13 @@ data class ReminderListState(
 )
 
 @HiltViewModel
-class ReminderListModel @Inject constructor(
-    private val repository: ReminderRepository
-) : ViewModel() {
+class ReminderListModel @Inject constructor(repository: ReminderRepository) : ViewModel() {
+    private val tag = "ReminderListModel"
 
-    private val _allRemindersAsync = repository.getRemindersStream().map { Async.Success(it) }
+    private val _allRemindersAsync = repository.getRemindersStream().map { reminders ->
+        Log.d(tag, "_allRemindersAsync (reminders.size: ${reminders.size})")
+        Async.Success(reminders.sortedBy { -(it.progress.first + (7 * it.progress.second)) })
+    }
 
     val uiState: StateFlow<ReminderListState> =
         _allRemindersAsync.map { ReminderListState(reminders = it.data) }.stateIn(

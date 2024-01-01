@@ -13,10 +13,11 @@ import java.time.DayOfWeek
 import javax.inject.Inject
 
 data class ReminderDetailsState(
+    val new: Boolean = false,
     val name: String = "Reminder",
     val start: DayOfWeek = DayOfWeek.MONDAY,
     val frequency: Int = 1,
-    val progress: Int = 0
+    val progress: Pair<Int, Int> = Pair(0, 0)
 )
 
 @HiltViewModel
@@ -104,14 +105,18 @@ class ReminderDetailsModel @Inject constructor(
         Log.d(tag, "loadReminder (uuid: $uuid)")
         viewModelScope.launch {
             repository.getReminder(uuid)?.let { reminder ->
+                Log.d(tag, "loadReminder (reminder: $reminder)")
                 _uiState.update {
                     it.copy(
+                        new = false,
                         name = reminder.name,
                         start = reminder.start,
                         frequency = reminder.frequency,
                         progress = reminder.progress
                     )
                 }
+            } ?: _uiState.update {
+                it.copy(new = true)
             }
         }
     }

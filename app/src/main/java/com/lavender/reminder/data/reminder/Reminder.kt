@@ -7,7 +7,7 @@ data class Reminder(
     val name: String,
     val start: DayOfWeek,
     val frequency: Int,
-    val progress: Int
+    val progress: Pair<Int, Int>
 )
 
 fun Reminder.toLocal() = LocalReminder(
@@ -15,7 +15,8 @@ fun Reminder.toLocal() = LocalReminder(
     name = name,
     start = start,
     frequency = frequency,
-    progress = progress
+    progressDays = progress.first,
+    progressWeeks = progress.second
 )
 
 fun List<Reminder>.toLocal() = map(Reminder::toLocal)

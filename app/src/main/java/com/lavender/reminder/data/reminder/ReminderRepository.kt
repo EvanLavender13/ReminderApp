@@ -18,8 +18,9 @@ class ReminderRepository @Inject constructor(
 
     suspend fun createReminder(name: String, start: DayOfWeek, frequency: Int) {
         val uuid = UUID.randomUUID().toString()
-        val reminder =
-            Reminder(uuid = uuid, name = name, start = start, frequency = frequency, progress = 0)
+        val reminder = Reminder(
+            uuid = uuid, name = name, start = start, frequency = frequency, progress = Pair(0, 0)
+        )
 
         Log.d(tag, "createReminder (reminder: $reminder)")
         localDataSource.upsert(reminder.toLocal())
@@ -33,7 +34,7 @@ class ReminderRepository @Inject constructor(
         localDataSource.upsert(reminder.toLocal())
     }
 
-    suspend fun updateProgress(uuid: String, progress: Int) {
+    suspend fun updateProgress(uuid: String, progress: Pair<Int, Int>) {
         val reminder = getReminder(uuid)?.copy(progress = progress)
             ?: throw Exception("Reminder (uuid $uuid) not found")
 

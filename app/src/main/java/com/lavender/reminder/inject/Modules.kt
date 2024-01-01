@@ -27,7 +27,7 @@ object ReminderDatabaseModule {
     fun provideDataBase(@ApplicationContext context: Context): ReminderDatabase {
         return Room.databaseBuilder(
             context.applicationContext, ReminderDatabase::class.java, "Reminders.db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
@@ -43,7 +43,7 @@ object WorkStateDatabaseModule {
     fun provideDataBase(@ApplicationContext context: Context): WorkStateDatabase {
         return Room.databaseBuilder(
             context.applicationContext, WorkStateDatabase::class.java, "WorkState.db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides

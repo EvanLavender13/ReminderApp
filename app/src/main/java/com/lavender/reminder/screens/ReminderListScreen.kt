@@ -4,6 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,7 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,25 +36,20 @@ fun ReminderListScreen(
     viewModel: ReminderListModel = hiltViewModel(), onNavigateToDetails: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    ReminderList(reminders = uiState.reminders, onNavigateToDetails = onNavigateToDetails)
-}
 
-@Composable
-fun ReminderList(reminders: List<Reminder>, onNavigateToDetails: (String) -> Unit) {
-    Scaffold(floatingActionButton = {
+    Scaffold(modifier = Modifier.fillMaxSize(), floatingActionButton = {
         Column(
-            modifier = Modifier.padding(15.0.dp),
-            verticalArrangement = Arrangement.spacedBy(15.0.dp)
+            modifier = Modifier.padding(25.dp), verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             FloatingActionButton(onClick = { onNavigateToDetails("0") }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }
         }
     }
 
     ) { padding ->
         LazyColumn(modifier = Modifier.padding(padding)) {
-            items(reminders) { reminder ->
+            items(uiState.reminders) { reminder ->
                 ReminderRow(reminder = reminder, onNavigateToDetails = onNavigateToDetails)
             }
         }
@@ -58,15 +58,31 @@ fun ReminderList(reminders: List<Reminder>, onNavigateToDetails: (String) -> Uni
 
 @Composable
 fun ReminderRow(reminder: Reminder, onNavigateToDetails: (String) -> Unit) {
-    Row(modifier = Modifier.clickable(onClick = { onNavigateToDetails(reminder.uuid) })) {
-        Text(text = reminder.name, fontSize = 30.sp, modifier = Modifier.weight(1.0f))
-        Text(text = "${reminder.start} in ${(7 * reminder.frequency) - reminder.progress}d")
-    }
-    Row {
-        LinearProgressIndicator(
-            progress = reminder.progress.toFloat() / (7 * reminder.frequency),
-            modifier = Modifier.weight(1.0f)
-        )
+    Column(
+        modifier = Modifier.clickable(onClick = { onNavigateToDetails(reminder.uuid) })
+    ) {
+        val days = reminder.progress.first
+        val weeks = reminder.progress.second
+        val progress = days + (7 * weeks)
+
+        Row {
+            Text(text = reminder.name, fontSize = 30.sp, modifier = Modifier.weight(1.0f))
+            Column {
+                Text(text = "${reminder.start.name.lowercase()} in ${(7 * reminder.frequency) - progress}d")
+                Text(text = "${reminder.frequency}w", modifier = Modifier.align(Alignment.End))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        Row {
+            LinearProgressIndicator(
+                progress = progress.toFloat() / (7 * reminder.frequency),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .height(15.dp)
+            )
+        }
     }
 }
 
@@ -75,7 +91,7 @@ fun ReminderRow(reminder: Reminder, onNavigateToDetails: (String) -> Unit) {
 fun ReminderListPreview() {
     ReminderTheme {
         Column {
-            ReminderList(reminders = listOf(), onNavigateToDetails = {})
+//            ReminderList(reminders = listOf(), onNavigateToDetails = {})
         }
     }
 }
