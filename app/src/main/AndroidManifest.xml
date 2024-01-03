@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Reminder">
         <activity
-            android:name=".MainActivity"
+            android:name=".ReminderActivity"
             android:exported="true"
             android:theme="@style/Theme.Reminder">
             <intent-filter>

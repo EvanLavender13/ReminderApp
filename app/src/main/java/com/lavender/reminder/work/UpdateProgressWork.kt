@@ -52,6 +52,7 @@ class UpdateProgressWork(
 
         reminderRepository.getReminders().forEach {
             Log.d(tag, "doWork (begin: ${it.uuid})")
+            Log.d(tag, "doWork (reminder: $it)")
 
             // TODO: this whole "progress" thing needs a rework
             val dayChanged = updateDay != lastUpdateDay
@@ -99,9 +100,15 @@ class UpdateProgressWork(
 
         Log.d(tag, "doWork (completed.size: ${completed.size})")
 
-        workStateRepository.updateWorkState(updateTime.toString())
+        val lastNotificationTime = Instant.parse(workState.lastNotificationTime)
+        Log.d(tag, "doWork (lastNotificationTime: $lastNotificationTime)")
 
-        if (completed.isNotEmpty() && (timeSinceLastUpdate >= 43200)) {
+        val timeSinceLastNotification = updateTime.epochSecond - lastNotificationTime.epochSecond
+        Log.d(tag, "doWork (timeSinceLastNotification: ${timeSinceLastNotification}s)")
+
+        var notificationTime = lastNotificationTime
+
+        if (completed.isNotEmpty() && (timeSinceLastNotification >= 43200)) {
             Log.d(tag, "doWork (building notification)")
             val stringBuilder = StringBuilder()
 
@@ -127,13 +134,17 @@ class UpdateProgressWork(
                         NotificationCompat.Builder(applicationContext, channelId)
                             .setSmallIcon(androidx.core.R.drawable.notification_icon_background)
                             .setContentTitle("Hey buddy").setContentText(stringBuilder.toString())
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT).setAutoCancel(true)
+                            .setPriority(NotificationCompat.PRIORITY_HIGH).setAutoCancel(true)
 
                     Log.i(tag, "doWork (sending notification)")
                     notify(1, notificationBuilder.build())
+
+                    notificationTime = updateTime
                 }
             }
         }
+
+        workStateRepository.updateWorkState(updateTime.toString(), notificationTime.toString())
 
         return Result.success()
     }

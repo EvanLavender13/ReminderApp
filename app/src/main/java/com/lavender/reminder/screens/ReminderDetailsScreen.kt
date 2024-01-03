@@ -111,8 +111,7 @@ fun ReminderDetails(
     }
 
     Row {
-        ExposedDropdownMenuBox(
-            expanded = startExpanded,
+        ExposedDropdownMenuBox(expanded = startExpanded,
             onExpandedChange = { startExpanded = !startExpanded }) {
             TextField(value = start.name.lowercase(),
                 label = { Text(text = "Start") },
@@ -124,8 +123,7 @@ fun ReminderDetails(
                 readOnly = true
             )
 
-            ExposedDropdownMenu(
-                expanded = startExpanded,
+            ExposedDropdownMenu(expanded = startExpanded,
                 onDismissRequest = { startExpanded = false }) {
                 DayOfWeek.values().forEach {
                     DropdownMenuItem(text = { Text(it.name.lowercase()) }, onClick = {
@@ -148,8 +146,7 @@ fun ReminderDetails(
                 readOnly = true
             )
 
-            ExposedDropdownMenu(
-                expanded = frequencyExpanded,
+            ExposedDropdownMenu(expanded = frequencyExpanded,
                 onDismissRequest = { frequencyExpanded = false }) {
                 intArrayOf(1, 2, 4).forEach {
                     DropdownMenuItem(text = { Text(text = "${it}w") }, onClick = {

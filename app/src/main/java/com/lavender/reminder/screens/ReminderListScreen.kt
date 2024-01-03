@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -22,7 +23,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +41,10 @@ fun ReminderListScreen(
         Column(
             modifier = Modifier.padding(25.dp), verticalArrangement = Arrangement.spacedBy(15.dp)
         ) {
+            FloatingActionButton(onClick = viewModel::toggleSortOrder) {
+                Icon(imageVector = Icons.Outlined.List, contentDescription = "Sort")
+            }
+
             FloatingActionButton(onClick = { onNavigateToDetails("0") }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
             }

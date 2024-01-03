@@ -31,7 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class ReminderActivity : ComponentActivity() {
     private val tag = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,12 +53,16 @@ class MainActivity : ComponentActivity() {
 
     private fun createNotificationChannel() {
         if (ActivityCompat.checkSelfPermission(
-                this@MainActivity, Manifest.permission.POST_NOTIFICATIONS
+                this, Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.d(tag, "Requesting ${Manifest.permission.POST_NOTIFICATIONS}")
+            Log.d(
+                tag,
+                "createNotificationChannel (requesting: ${Manifest.permission.POST_NOTIFICATIONS})"
+            )
+
             ActivityCompat.requestPermissions(
-                this@MainActivity, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1
+                this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1
             )
         }
 
@@ -67,12 +71,11 @@ class MainActivity : ComponentActivity() {
 
         val channelId = "ReminderAppChannel"
         val channel = NotificationChannel(
-            channelId, "ReminderAppChannel", NotificationManager.IMPORTANCE_DEFAULT
+            channelId, "ReminderAppChannel", NotificationManager.IMPORTANCE_HIGH
         )
 
         Log.d(tag, "createNotificationChannel (channel: $channel)")
         notificationManager.createNotificationChannel(channel)
-
     }
 
     private fun scheduleWork() {
@@ -99,15 +102,13 @@ fun ReminderNavHost(
     ) {
         composable(route = "main") {
             ReminderListScreen(onNavigateToDetails = { uuid: String ->
-                navController.navigate(
-                    route = "details/${uuid}"
-                )
+                navController.navigate(route = "details/${uuid}")
             })
         }
 
         composable("details/{uuid}") {
             ReminderDetailsScreen(
-                navigateBack = { navController.popBackStack() }, updateProgress = updateProgress
+                navigateBack = navController::popBackStack, updateProgress = updateProgress
             )
         }
     }

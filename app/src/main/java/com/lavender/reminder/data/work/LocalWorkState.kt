@@ -5,10 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "work")
 data class LocalWorkState(
-    @PrimaryKey val id: Int = 1,
-    val lastUpdateTime: String
+    @PrimaryKey val id: Int = 1, val lastUpdateTime: String, val lastNotificationTime: String
 )
 
 fun LocalWorkState.toExternal() = WorkState(
-    lastUpdateTime = lastUpdateTime
+    lastUpdateTime = lastUpdateTime, lastNotificationTime = lastNotificationTime
 )
